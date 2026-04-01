@@ -1,50 +1,42 @@
 import { useState } from 'react'
-import { useAppContext } from '@/context/AppContext'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/hooks/use-auth'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { BarChart2 } from 'lucide-react'
 
-const COLORS = [
-  '#ef4444',
-  '#f97316',
-  '#f59e0b',
-  '#84cc16',
-  '#10b981',
-  '#14b8a6',
-  '#06b6d4',
-  '#0ea5e9',
-  '#3b82f6',
-  '#6366f1',
-  '#8b5cf6',
-  '#a855f7',
-  '#d946ef',
-  '#ec4899',
-  '#f43f5e',
-]
-
 export default function Login() {
-  const { login } = useAppContext()
+  const { signIn, signUp } = useAuth()
+  const navigate = useNavigate()
   const [isRegistering, setIsRegistering] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.trim() || !password.trim()) return
-    if (isRegistering && !name.trim()) return
+    setErrorMsg('')
+    setLoading(true)
 
-    const finalName = isRegistering ? name.trim() : email.split('@')[0]
-
-    let hash = 0
-    for (let i = 0; i < finalName.length; i++) {
-      hash = finalName.charCodeAt(i) + ((hash << 5) - hash)
+    try {
+      if (isRegistering) {
+        const { error } = await signUp(email, password, { data: { name } })
+        if (error) throw error
+        navigate('/')
+      } else {
+        const { error } = await signIn(email, password)
+        if (error) throw error
+        navigate('/')
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Erro na autenticação')
+    } finally {
+      setLoading(false)
     }
-    const color = COLORS[Math.abs(hash) % COLORS.length]
-
-    login({ email, name: finalName, color })
   }
 
   return (
@@ -60,7 +52,13 @@ export default function Login() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleAuth} className="space-y-5">
+            {errorMsg && (
+              <div className="text-sm text-red-600 bg-red-50 p-3 rounded border border-red-100">
+                {errorMsg}
+              </div>
+            )}
+
             {isRegistering && (
               <div className="space-y-2 text-left">
                 <Label htmlFor="name">Nome Completo</Label>
@@ -101,15 +99,24 @@ export default function Login() {
             <Button
               type="submit"
               className="w-full h-11 text-base font-medium bg-indigo-600 hover:bg-indigo-700 mt-2"
-              disabled={!email.trim() || !password.trim() || (isRegistering && !name.trim())}
+              disabled={
+                loading || !email.trim() || !password.trim() || (isRegistering && !name.trim())
+              }
             >
-              {isRegistering ? 'Criar Conta Segura' : 'Entrar na Plataforma'}
+              {loading
+                ? 'Aguarde...'
+                : isRegistering
+                  ? 'Criar Conta Segura'
+                  : 'Entrar na Plataforma'}
             </Button>
 
             <div className="text-center pt-2">
               <button
                 type="button"
-                onClick={() => setIsRegistering(!isRegistering)}
+                onClick={() => {
+                  setIsRegistering(!isRegistering)
+                  setErrorMsg('')
+                }}
                 className="text-sm text-indigo-600 hover:underline font-medium"
               >
                 {isRegistering

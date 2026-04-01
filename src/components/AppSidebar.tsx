@@ -25,22 +25,19 @@ import {
 } from '@/components/ui/sidebar'
 import { useAppContext } from '@/context/AppContext'
 
+import { ShieldAlert } from 'lucide-react'
+import { useAuth } from '@/hooks/use-auth'
+
 const navItems = [
-  { title: 'Comparativo Semanal', path: '/', icon: BarChart2 },
-  { title: 'Dias Específicos', path: '/specific-days', icon: CalendarDays },
-  { title: 'Dados Consolidados', path: '/consolidated', icon: PieChart },
-  { title: 'Previsibilidade', path: '/predictability', icon: Target },
+  { title: 'Dashboard Diário', path: '/', icon: BarChart2 },
+  { title: 'Relatórios', path: '/consolidated', icon: PieChart },
   { title: 'Base de Dados', path: '/database', icon: Database },
-  { title: 'Integrações', path: '/integrations', icon: Plug },
-  { title: 'Análise Semanal', path: '/analysis', icon: BrainCircuit },
-  { title: 'Histórico Relatórios', path: '/history', icon: History },
-  { title: 'Log de Atividades', path: '/activity-log', icon: Activity },
-  { title: 'Manual do Usuário', path: '/manual', icon: BookOpen },
+  { title: 'Painel Admin', path: '/admin', icon: ShieldAlert },
 ]
 
 export function AppSidebar() {
   const location = useLocation()
-  const { user, logout } = useAppContext()
+  const { user, signOut } = useAuth()
 
   return (
     <Sidebar>
@@ -79,23 +76,20 @@ export function AppSidebar() {
         {user && (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 overflow-hidden">
-              <div
-                className="w-9 h-9 rounded-full flex shrink-0 items-center justify-center text-white font-bold text-sm shadow-sm"
-                style={{ backgroundColor: user.color }}
-              >
-                {user.name.charAt(0).toUpperCase()}
+              <div className="w-9 h-9 rounded-full flex shrink-0 items-center justify-center text-white font-bold text-sm shadow-sm bg-indigo-600">
+                {user.email?.charAt(0).toUpperCase()}
               </div>
               <div className="truncate">
                 <p className="text-sm font-semibold text-sidebar-foreground truncate">
-                  {user.name}
+                  {user.email?.split('@')[0]}
                 </p>
                 <p className="text-[11px] text-sidebar-foreground/60 truncate font-medium">
-                  Administrador
+                  Logado(a)
                 </p>
               </div>
             </div>
             <button
-              onClick={logout}
+              onClick={signOut}
               className="p-2 hover:bg-red-50 rounded-md text-sidebar-foreground/50 hover:text-red-600 transition-colors"
               title="Sair do sistema"
             >
