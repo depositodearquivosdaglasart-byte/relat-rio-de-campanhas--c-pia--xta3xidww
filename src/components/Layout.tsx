@@ -2,18 +2,13 @@ import { Outlet } from 'react-router-dom'
 import { AppSidebar } from './AppSidebar'
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
 import { useAppContext } from '@/context/AppContext'
-import Login from '@/pages/Login'
 import { RefreshCw, CloudUpload, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 export default function Layout() {
-  const { user, refreshFromCloud, hasUnsavedChanges, isSaving, isRefreshing, isInitializing } =
+  const { refreshFromCloud, hasUnsavedChanges, isSaving, isRefreshing, isInitializing } =
     useAppContext()
-
-  if (!user) {
-    return <Login />
-  }
 
   if (isInitializing) {
     return (

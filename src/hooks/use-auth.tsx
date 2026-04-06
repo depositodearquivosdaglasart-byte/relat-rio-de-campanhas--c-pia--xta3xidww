@@ -19,8 +19,11 @@ export const useAuth = () => {
 }
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<any | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<any | null>({
+    id: '00000000-0000-0000-0000-000000000000',
+    email: 'default@local',
+  })
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     // Auto-login logic to bypass authentication while providing a valid user object
@@ -30,15 +33,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const { data } = await supabase.from('usuarios').select('*').limit(1)
         if (data && data.length > 0) {
           setUser(data[0])
-        } else {
-          // Fallback if no user exists in the database
-          setUser({ id: '00000000-0000-0000-0000-000000000000', email: 'default@local' })
         }
       } catch (e) {
         console.error('Error fetching default user', e)
-        setUser({ id: '00000000-0000-0000-0000-000000000000', email: 'default@local' })
-      } finally {
-        setLoading(false)
       }
     }
 
