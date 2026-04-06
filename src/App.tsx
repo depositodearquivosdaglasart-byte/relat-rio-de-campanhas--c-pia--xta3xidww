@@ -1,12 +1,10 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { AppProvider } from '@/context/AppContext'
 import { AuthProvider } from '@/hooks/use-auth'
-import { ProtectedRoute } from '@/components/ProtectedRoute'
 import Layout from './components/Layout'
-import Login from './pages/Login'
 import Index from './pages/Index'
 import SpecificDays from './pages/SpecificDays'
 import Database from './pages/Database'
@@ -28,22 +26,21 @@ const App = () => (
           <Toaster />
           <Sonner />
           <Routes>
-            <Route path="/login" element={<Login />} />
+            {/* Redirect any legacy auth attempts directly to the dashboard */}
+            <Route path="/login" element={<Navigate to="/" replace />} />
 
-            <Route element={<ProtectedRoute />}>
-              <Route element={<Layout />}>
-                <Route path="/" element={<Index />} />
-                <Route path="/specific-days" element={<SpecificDays />} />
-                <Route path="/consolidated" element={<Consolidated />} />
-                <Route path="/predictability" element={<Predictability />} />
-                <Route path="/database" element={<Database />} />
-                <Route path="/integrations" element={<Integrations />} />
-                <Route path="/analysis" element={<Analysis />} />
-                <Route path="/history" element={<History />} />
-                <Route path="/activity-log" element={<ActivityLog />} />
-                <Route path="/manual" element={<UserManual />} />
-                <Route path="/admin" element={<Admin />} />
-              </Route>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Index />} />
+              <Route path="/specific-days" element={<SpecificDays />} />
+              <Route path="/consolidated" element={<Consolidated />} />
+              <Route path="/predictability" element={<Predictability />} />
+              <Route path="/database" element={<Database />} />
+              <Route path="/integrations" element={<Integrations />} />
+              <Route path="/analysis" element={<Analysis />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/activity-log" element={<ActivityLog />} />
+              <Route path="/manual" element={<UserManual />} />
+              <Route path="/admin" element={<Admin />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
